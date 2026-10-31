@@ -1,0 +1,6 @@
+{
+  "chainId": 5042,
+  "network": "Arc Mainnet",
+  "note": "Nothing custom is deployed. Veltrio's Send flow uses the official USDC contract. contracts/Veltrio.sol is source only and is not deployed or connected to the app. After you deploy it yourself, add an entry such as \"Veltrio\": { \"address\": \"0x...\", \"deployTx\": \"0x...\", \"verified\": false }. Never put the USDC address here: it lives in src/config/network.ts.",
+  "contracts": {}
+}
