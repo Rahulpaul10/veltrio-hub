@@ -1,0 +1,17 @@
+{
+  "label": "ARC TESTNET deployment record - NOT Arc Mainnet",
+  "network": "Arc Testnet",
+  "chainId": 5042002,
+  "contracts": {
+    "Veltrio": {
+      "address": "0xff5a21b1dd46091856585e3df65f65c6771ca0d7",
+      "deployTx": "0xc1150651dc7f6eb10dcb6451f2c2ac345ebf84e6b3ba7ae392b4da61186d726c",
+      "deployedAt": "2026-10-31T20:19:40.840Z",
+      "explorer": "https://explorer.testnet.arc.io/address/0xff5a21b1dd46091856585e3df65f65c6771ca0d7",
+      "verified": false,
+      "constructorArgument": "0x3600000000000000000000000000000000000000 (Arc Testnet USDC)",
+      "sourceVersion": "contracts/Veltrio.sol as of git commit 58aee1a (constructor took the USDC address). This is NOT the current Arc Mainnet source, which has no constructor arguments and refuses to deploy on any chain except 5042."
+    }
+  },
+  "note": "Testnet only, test funds only, not audited. Never copy this address into arc-mainnet.json or the app config."
+}

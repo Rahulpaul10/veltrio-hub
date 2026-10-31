@@ -14,10 +14,25 @@ contract is deployed. Those steps are yours.
 | Deployed contract addresses | `contracts/deployments/arc-mainnet.json` |
 | Contract ABIs | `contracts/abi/*.abi.json` (app copy in `src/abi/`) |
 | Solidity sources and deploy scripts | `contracts/` and `contracts/script/` |
-| Secrets for deployment | `.env` on your machine only (see `.env.example`) |
+| Optional settings and deployment variables | `.env` on your machine only (git-ignored; see the table below) |
 
 Frontend variables start with `VITE_` and are published inside the website. Never put a private key,
 seed phrase or API secret in a `VITE_` variable.
+
+The repository intentionally does not include any environment files or templates. Create your own `.env` in the project root (it is git-ignored) with lines in the form
+`NAME=value`. Every variable is optional, and none of them may hold a secret value that you would not
+publish:
+
+| Name | Where it is used | Notes |
+| --- | --- | --- |
+| `VITE_SITE_DOMAIN` | Website (public) | Your domain without `https://`, shown in the footer |
+| `VITE_RPC_URLS` | Website (public) | Extra https Arc Mainnet RPC endpoints, comma separated. Never include a secret key in the URL. The app checks that each endpoint reports chain 5042 |
+| `ARC_MAINNET_RPC_URL` | Your computer only | RPC endpoint for Foundry or scripts when you deploy your own contract |
+| `ETH_KEYSTORE_ACCOUNT` | Your computer only | Name of an encrypted keystore account (`cast wallet import`), not a private key |
+| `ARC_EXPLORER_VERIFIER_URL` | Your computer only | Verification endpoint, only if the explorer offers a compatible one |
+
+On Netlify, set the two `VITE_` variables under **Project configuration > Environment variables** instead
+of using a file.
 
 ## 2. Does Veltrio need its own contract?
 
@@ -49,6 +64,11 @@ Use Arc Foundry (`arc-forge`, `arc-cast`) as recommended by Arc, or standard Fou
 
    Arc enforces a minimum `maxFeePerGas` of 20 gwei. If a transaction is rejected as underpriced, pass
    `--priority-gas-price` / `--gas-price` accordingly.
+
+For `contracts/Veltrio.sol` specifically: it needs **no constructor arguments**, has the Arc Mainnet chain ID
+(5042), the official USDC address and 6 decimals built in, and reverts with `WrongChain` if it is deployed on
+any other chain. The command is the same as above with `contracts/Veltrio.sol:Veltrio`. It is not deployed and
+not audited; Arc Testnet deployments are recorded separately in `contracts/deployments/arc-testnet.json`.
 
 ## 4. Verify the contract
 

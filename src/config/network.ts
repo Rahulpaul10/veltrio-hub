@@ -6,7 +6,7 @@
  * the chain id, explorer and USDC contract are fixed here on purpose so a typo in
  * an environment variable can never silently move the app to another network.
  *
- * Things you can change without touching code (see .env.example):
+ * Things you can change without touching code (see README.md, Environment variables):
  *   VITE_SITE_DOMAIN  your own domain, e.g. wallet.example.com
  *   VITE_RPC_URLS     extra https RPC endpoints, tried before the default one
  *

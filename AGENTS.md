@@ -48,7 +48,7 @@ bun run verify:build   # fails on testnet strings, secret names, missing Arc Mai
 
 ## Security and transaction rules
 
-- Never put private keys, seed phrases or API secrets in code or in a `VITE_` variable (bundled publicly). Deployment settings live in `.env` (gitignored); `.env.example` has no secrets.
+- Never put private keys, seed phrases or API secrets in code or in a `VITE_` variable (bundled publicly). Deployment settings live in `.env` (gitignored). The repository intentionally contains no environment files or templates; optional variables are documented in README.md and docs/DEPLOYMENT.md.
 - Transactions are signed and broadcast only by the user's wallet via a single `writeContract` call after a Review step. The RPC client has no send methods and read retries never apply to submissions.
 - Never auto-resubmit. After an error that does not prove nothing was sent (network/unknown/internal wallet error), the UI blocks going back to review and tells the user to check Activity and their wallet. viem's mislabel of "Internal JSON-RPC error" as a revert is treated as ambiguous.
 - "Confirmed" only when the receipt has status success AND the official USDC contract logged the exact transfer requested (sender, recipient, amount; `src/lib/receipt.ts`). A successful receipt without that log is "Included, but not verified" (never success); "Failed" only from a reverted receipt; no receipt = Pending (never failed). Pending older than 10 minutes is labeled "Not confirmed" (may be replaced or dropped).

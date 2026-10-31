@@ -111,11 +111,32 @@ describe('custom contract stays separate from official USDC', () => {
     expect(readFileSync(new URL('../hooks/useSendTransfer.ts', import.meta.url), 'utf8')).toContain('address: NETWORK.usdc.address')
   })
 
-  test('the Veltrio ABI file exposes only pay, usdc and the Payment event (no admin or custody functions)', () => {
-    const abi = JSON.parse(readFileSync(new URL('../../contracts/abi/Veltrio.abi.json', import.meta.url), 'utf8')) as Array<{ type: string; name?: string; stateMutability?: string }>
+  test('the Veltrio ABI file exposes only pay and read-only constants, takes no constructor arguments, and has no custody or admin surface', () => {
+    const abi = JSON.parse(readFileSync(new URL('../../contracts/abi/Veltrio.abi.json', import.meta.url), 'utf8')) as Array<{ type: string; name?: string; stateMutability?: string; inputs?: unknown[] }>
     const fns = abi.filter((x) => x.type === 'function').map((x) => x.name).sort()
-    expect(fns).toEqual(['pay', 'usdc'])
+    expect(fns).toEqual(['ARC_MAINNET_CHAIN_ID', 'USDC', 'USDC_DECIMALS', 'pay'])
+    expect(abi.filter((x) => x.type === 'constructor').every((x) => (x.inputs ?? []).length === 0)).toBe(true)
     expect(abi.filter((x) => x.type === 'event').map((x) => x.name)).toEqual(['Payment'])
     expect(abi.some((x) => x.stateMutability === 'payable' || x.type === 'receive' || x.type === 'fallback')).toBe(false)
+  })
+
+  test("Veltrio.sol hard-codes exactly the app's verified Arc Mainnet chain id, USDC address and 6 decimals", () => {
+    const src = readFileSync(new URL('../../contracts/Veltrio.sol', import.meta.url), 'utf8')
+    expect(src).toContain(`address public constant USDC = ${NETWORK.usdc.address};`)
+    expect(src).toContain(`uint256 public constant ARC_MAINNET_CHAIN_ID = ${NETWORK.chainId};`)
+    expect(src).toContain(`uint8 public constant USDC_DECIMALS = ${NETWORK.usdc.decimals};`)
+    expect(src).not.toMatch(/5042002/)
+  })
+
+  test('the Arc Testnet deployment record is separate, labelled testnet, and never mixed into the mainnet file or app config', () => {
+    const testnet = JSON.parse(readFileSync(new URL('../../contracts/deployments/arc-testnet.json', import.meta.url), 'utf8')) as { chainId: number; label: string; contracts: Record<string, { address: string }> }
+    expect(testnet.chainId).toBe(5042002)
+    expect(testnet.label).toMatch(/TESTNET/)
+    const mainnetText = readFileSync(new URL('../../contracts/deployments/arc-mainnet.json', import.meta.url), 'utf8').toLowerCase()
+    const appText = readFileSync(new URL('../config/network.ts', import.meta.url), 'utf8').toLowerCase()
+    for (const c of Object.values(testnet.contracts)) {
+      expect(mainnetText).not.toContain(c.address.toLowerCase())
+      expect(appText).not.toContain(c.address.toLowerCase())
+    }
   })
 })

@@ -33,13 +33,21 @@ bun run preview    # serve the production build locally
 
 ### Environment variables
 
-Copy `.env.example` to `.env`. All are optional.
+There is no template file. Everything is optional, and the app runs with none of them. To use one, create a
+file named `.env` in the project root (it is git-ignored and never committed) and add lines in the form
+`NAME=value`, or set the same names in your hosting dashboard. Do not put private keys, seed phrases or
+API secrets in any of them.
 
 | Name | Purpose |
 | --- | --- |
-| `VITE_SITE_DOMAIN` | Your own domain, shown in the footer |
-| `VITE_RPC_URLS` | Extra https Arc Mainnet RPC endpoints, tried before the default |
-| `ARC_MAINNET_RPC_URL`, `ETH_KEYSTORE_ACCOUNT`, `ARC_EXPLORER_VERIFIER_URL` | Only for deploying your own contract from your machine |
+| `VITE_SITE_DOMAIN` | Your own domain without `https://`, shown in the footer. Public. |
+| `VITE_RPC_URLS` | Extra https Arc Mainnet RPC endpoints, comma separated, tried before the default. Public: never use a URL that contains a secret key. |
+| `ARC_MAINNET_RPC_URL` | Only for deploying your own contract from your machine: the Arc Mainnet RPC endpoint (see Arc's docs) |
+| `ETH_KEYSTORE_ACCOUNT` | Only for deploying from your machine: the name of an encrypted Foundry keystore account, never a raw private key |
+| `ARC_EXPLORER_VERIFIER_URL` | Only for contract verification from your machine, if the explorer offers a compatible endpoint |
+
+Variables that start with `VITE_` are published inside the website. The others are used only by command-line
+tools on your own computer.
 
 ## Deploying
 
