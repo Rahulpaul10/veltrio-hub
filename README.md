@@ -51,7 +51,7 @@ tools on your own computer.
 
 ## Deploying
 
-Netlify settings are included. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the Netlify setup, custom domain and DNS steps, and for deploying, verifying and recording your own contract.
+Netlify settings and a `public/vercel.json` for Vercel (rewrites and security headers) are included. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the Netlify setup, custom domain and DNS steps, and for deploying, verifying and recording your own contract.
 
 ## Project layout
 

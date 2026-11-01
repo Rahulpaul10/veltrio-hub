@@ -1,6 +1,10 @@
 {
   "chainId": 5042,
   "network": "Arc Mainnet",
-  "note": "Nothing custom is deployed on Arc Mainnet. Veltrio's Send flow uses the official USDC contract. contracts/Veltrio.sol is the Arc Mainnet source (no constructor arguments; it refuses to deploy on any other chain) but it is NOT deployed, NOT audited and NOT connected to the app. After you deploy it yourself from your own wallet, add an entry such as \"Veltrio\": { \"address\": \"0x...\", \"deployTx\": \"0x...\", \"verified\": false }. Testnet deployments live only in arc-testnet.json. Never put the USDC address here: it lives in src/config/network.ts.",
-  "contracts": {}
+  "note": "Nothing custom is deployed on Arc Mainnet. Veltrio's Send flow uses the official USDC contract. contracts/Veltrio.sol is the Arc Mainnet source (one constructor argument, initialOwner; it refuses to deploy on any other chain) but it is NOT deployed, NOT audited and NOT connected to the app. After you deploy it yourself from your own wallet, add an entry such as \"Veltrio\": { \"address\": \"0x...\", \"deployTx\": \"0x...\", \"verified\": false }. Testnet deployments live only in arc-testnet.json. Never put the USDC address here: it lives in src/config/network.ts.",
+  "contracts": {},
+  "plannedConstructorArgs": {
+    "initialOwner": "0x901f10BC9F2Af3785CF29dDB93A2afe68008D7B2",
+    "comment": "Documentation only: the value to enter in the deploy form. It is not a deployed address and the app does not read it."
+  }
 }

@@ -68,6 +68,8 @@ Netlify config is in `netlify.toml`, `public/_redirects`, `public/_headers`. Ste
 
 ## Custom contract (source only)
 
-- `contracts/Veltrio.sol` (solc 0.8.28, no imports) is a non-custodial payment-reference helper written for review in Remix. It is NOT deployed and NOT connected to the app. Send still calls the official Arc USDC contract directly.
+- `contracts/Veltrio.sol` (solc 0.8.28, OpenZeppelin 5.6.1 Ownable2Step/Pausable/SafeERC20) is an Arc Mainnet-only (chain 5042) non-custodial payment-reference helper with a limited owner (`initialOwner` constructor argument; pause for at most 3 days with a 1-day cooldown, rescue stray balances, two-step ownership; cannot touch users' funds). It is NOT deployed, NOT independently audited and NOT connected to the app. Send still calls the official Arc USDC contract directly.
 - `contracts/deployments/arc-mainnet.json` must stay empty until the owner deploys it themselves; never add placeholder addresses. The official USDC address lives only in `src/config/network.ts`.
-- Checks: `bun run contracts:build`, `bun run contracts:test` (25 Foundry tests). Remix steps: `contracts/README.md`.
+- Checks: `bun run contracts:build`, `bun run contracts:test` (149 Foundry tests including invariants; the invariant run takes a few minutes). Remix steps: `contracts/README.md`.
+- `public/vercel.json` is required for Vercel (rewrites for deep links and security headers; Vercel ignores `_redirects`/`_headers`). Keep it committed.
+- Pause expiry emits no `Unpaused` event: read `paused()`. Pin OpenZeppelin 5.6.1 in Remix (flatten or versioned imports); see `contracts/README.md`.

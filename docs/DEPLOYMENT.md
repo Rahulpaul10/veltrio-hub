@@ -65,10 +65,32 @@ Use Arc Foundry (`arc-forge`, `arc-cast`) as recommended by Arc, or standard Fou
    Arc enforces a minimum `maxFeePerGas` of 20 gwei. If a transaction is rejected as underpriced, pass
    `--priority-gas-price` / `--gas-price` accordingly.
 
-For `contracts/Veltrio.sol` specifically: it needs **no constructor arguments**, has the Arc Mainnet chain ID
-(5042), the official USDC address and 6 decimals built in, and reverts with `WrongChain` if it is deployed on
-any other chain. The command is the same as above with `contracts/Veltrio.sol:Veltrio`. It is not deployed and
-not audited; Arc Testnet deployments are recorded separately in `contracts/deployments/arc-testnet.json`.
+For `contracts/Veltrio.sol` specifically:
+
+- **Constructor:** one argument, `initialOwner`: the wallet that may pause payments for at most 3 days, sweep
+  stray balances and hand over ownership. Planned value `0x901f10BC9F2Af3785CF29dDB93A2afe68008D7B2`; check it
+  character by character at deploy time. The owner is not written into the source.
+- **Built in:** the Arc Mainnet chain ID (5042), the official USDC address and 6 decimals. It reverts with
+  `WrongChain` on any other chain.
+- **Compiler:** solc `0.8.28`, EVM `cancun`, optimizer on, `200` runs.
+- **OpenZeppelin is pinned to 5.6.1** (exact, in `package.json`), the version all tests and reviews used.
+  Do not let Remix pick "latest" from npm. Use one of these:
+  1. **Recommended (exact):** run `forge flatten contracts/Veltrio.sol > Veltrio.flat.sol` and paste that single
+     file into Remix. It contains the pinned OpenZeppelin 5.6.1 code and has no imports. A check on this
+     project showed it compiles to the same runtime bytecode as the normal build (metadata hash excluded).
+     Do not commit the flattened file; it is a build output.
+  2. **Pinned imports:** in Remix, change each import to
+     `@openzeppelin/contracts@5.6.1/...` (for example `@openzeppelin/contracts@5.6.1/access/Ownable.sol`), and
+     confirm in the file explorer that `.deps/npm/@openzeppelin/contracts@5.6.1/` exists.
+  Verify the deployed source on the explorer with the same file you compiled.
+- **With Foundry** the form is `forge create contracts/Veltrio.sol:Veltrio --constructor-args <OWNER_ADDRESS> ...`
+  plus the flags shown above.
+- **Pause expiry emits no event.** A pause ends on its own after 3 days, and no `Unpaused` event is emitted when
+  it does (a manual `unpause()` does emit one). Anything that reads logs, such as an indexer or a monitoring
+  script, must call `paused()` for the real state and must not treat the latest `Paused` event as "currently
+  paused". `pausedAt()` and `pauseLockedUntil()` give the timestamps.
+- **Status:** not deployed and not independently audited. The app does not call this contract. Arc Testnet
+  deployments of an earlier version are recorded separately in `contracts/deployments/arc-testnet.json`.
 
 ## 4. Verify the contract
 
@@ -144,3 +166,16 @@ real domain, and no DNS records have been created or changed by this project.
 - Send a very small amount of real USDC between two of your own wallets on the deployed site and confirm
   the balance, the fee shown in the wallet, the Activity entry and the explorer link.
 - Have the code independently reviewed or audited before you promote it.
+
+## Deploying the website to Vercel
+
+`public/vercel.json` is copied into the build output (`dist/`) and is needed on Vercel. Vercel ignores the
+Netlify-style `_redirects` and `_headers` files, so this file supplies the two things the app needs:
+
+- **Rewrites:** every path except `/assets/` serves `index.html`, so direct links and refreshes on `/send`,
+  `/receive` and `/activity` work.
+- **Security headers:** `X-Frame-Options: DENY`, `nosniff`, a strict referrer policy, a restrictive permissions
+  policy, HSTS, and long-lived caching for hashed files in `/assets/`.
+
+Keep it committed. If it is missing, deep links would most likely return a 404 on Vercel and the headers would
+not be sent. It is harmless on Netlify, which uses `netlify.toml` and `public/_redirects`.

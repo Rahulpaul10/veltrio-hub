@@ -10,7 +10,7 @@
       "explorer": "https://explorer.testnet.arc.io/address/0xff5a21b1dd46091856585e3df65f65c6771ca0d7",
       "verified": false,
       "constructorArgument": "0x3600000000000000000000000000000000000000 (Arc Testnet USDC)",
-      "sourceVersion": "contracts/Veltrio.sol as of git commit 58aee1a (constructor took the USDC address). This is NOT the current Arc Mainnet source, which has no constructor arguments and refuses to deploy on any chain except 5042."
+      "sourceVersion": "contracts/Veltrio.sol as of git commit 58aee1a (constructor took the USDC address). This is NOT the current Arc Mainnet source, which takes one constructor argument (initialOwner), includes owner-only pause and rescue functions, and refuses to deploy on any chain except 5042."
     }
   },
   "note": "Testnet only, test funds only, not audited. Never copy this address into arc-mainnet.json or the app config."
